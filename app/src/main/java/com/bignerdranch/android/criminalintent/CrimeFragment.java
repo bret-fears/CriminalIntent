@@ -231,18 +231,33 @@ public class CrimeFragment extends Fragment {
             public void onClick(View v) {
                 FragmentManager fragmentManager = getFragmentManager();
                 if (mPhotoDialog == null) {
-                    Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
-                    createPhotoDialog(fragmentManager, bitmap);
+                    if (mPhotoFile.exists()) {
+                        Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+                        createPhotoDialog(fragmentManager, bitmap);
+                    } else {
+                        showNoPhotoToast();
+                    }
                 } else if (mPhotoDialog.getDialog() == null) {
-                    Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
-                    createPhotoDialog(fragmentManager, bitmap);
-                } else if (!mPhotoDialog.getDialog().isShowing()) {
+                    if (mPhotoFile.exists()) {
+                        Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+                        createPhotoDialog(fragmentManager, bitmap);
+                    } else {
+                        showNoPhotoToast();
+                    }
+                } else if (!mPhotoDialog.getDialog().isShowing() && mPhotoFile.exists()) {
                     mPhotoDialog.show(fragmentManager, DIALOG_PHOTO);
+                } else {
+                    showNoPhotoToast();
                 }
             }
         });
 
         return v;
+    }
+
+    private void showNoPhotoToast() {
+        Toast.makeText(getActivity(), R.string.no_photo_toast_string, Toast.LENGTH_SHORT)
+                .show();
     }
 
     private void createPhotoDialog(FragmentManager fragmentManager, Bitmap bitmap) {
