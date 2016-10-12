@@ -61,6 +61,7 @@ public class CrimeFragment extends Fragment {
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
     private Callbacks mCallbacks;
+    private ZoomedPhotoFragment mPhotoDialog;
 
     /**
      * Required interface for hosting activities
@@ -229,14 +230,25 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentManager fragmentManager = getFragmentManager();
-                Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
-                ZoomedPhotoFragment dialog = ZoomedPhotoFragment.newInstance(bitmap);
-                dialog.setTargetFragment(CrimeFragment.this, REQUEST_PHOTO);
-                dialog.show(fragmentManager, DIALOG_PHOTO);
+                if (mPhotoDialog == null) {
+                    Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+                    createPhotoDialog(fragmentManager, bitmap);
+                } else if (mPhotoDialog.getDialog() == null) {
+                    Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+                    createPhotoDialog(fragmentManager, bitmap);
+                } else if (!mPhotoDialog.getDialog().isShowing()) {
+                    mPhotoDialog.show(fragmentManager, DIALOG_PHOTO);
+                }
             }
         });
 
         return v;
+    }
+
+    private void createPhotoDialog(FragmentManager fragmentManager, Bitmap bitmap) {
+        mPhotoDialog = ZoomedPhotoFragment.newInstance(bitmap);
+        mPhotoDialog.setTargetFragment(CrimeFragment.this, REQUEST_PHOTO);
+        mPhotoDialog.show(fragmentManager, DIALOG_PHOTO);
     }
 
     @Override
